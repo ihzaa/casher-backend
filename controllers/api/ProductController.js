@@ -3,12 +3,6 @@ import product from '../../models/Product.js';
 async function store(req, res) {
     try {
         const { title, price, thumbnail, categoryId } = req.body;
-        let isExist = await product.find({
-            title
-        }).count();
-        if (isExist > 0) {
-            throw { code: 422, message: 'Product is already exist!' }
-        }
         let createdData = await product.create({
             title,
             price,
