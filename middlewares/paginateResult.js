@@ -1,17 +1,23 @@
-const paginate_result = (model, options) => {
-  return async (req, res, next) => {
+const paginateResult = (model, options = {
+  where: {},
+  select: {}
+}) => {
+  return async (req, res) => {
     try {
       let limit = req.query.limit ? parseInt(req.query.limit) : 10;
       let page = req.query.page ? parseInt(req.query.page) : 1;
 
       let offset = limit * page - limit;
 
-      let data = await model.findAll({
-        offset,
-        limit,
-        ...options,
-      });
-
+      let data = await model
+        .find({
+          ...options.where,
+        })
+        .limit(limit)
+        .skip(offset)
+        .select(
+          typeof options.select === 'string' ? options.select : { ...options.select }
+        );
       let meta = {
         total: await model.count(),
         per_page: limit,
@@ -19,7 +25,7 @@ const paginate_result = (model, options) => {
       };
       let total_pages = 0;
       if (meta.total > 0) {
-        let total_pages =
+        total_pages =
           parseInt(meta.total / meta.per_page) < meta.total / meta.per_page
             ? meta.total / meta.per_page + 1
             : meta.total / meta.per_page;
@@ -29,7 +35,7 @@ const paginate_result = (model, options) => {
         `${req.protocol}://${req.get("host")}${req.originalUrl}`
       );
 
-      for (i = 1; i <= total_pages; i++) {
+      for (let i = 1; i <= total_pages; i++) {
         var search_params = url.searchParams;
 
         // new value of "id" is set to "101"
@@ -52,17 +58,17 @@ const paginate_result = (model, options) => {
         next: meta.links[page] ? meta.links[page].url : null,
       };
 
-      res.paginatedResult = {
+      return res.json({
         data,
         links,
         meta,
-      };
+      });
 
-      next();
+      // next();
     } catch (e) {
-      res.status(500).json({ message: e.message });
+      res.status(e.code ?? 500).json({ message: e.message });
     }
   };
 };
 
-module.exports = { paginate_result };
+export default paginateResult;
