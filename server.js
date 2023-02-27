@@ -9,7 +9,9 @@ const app = express();
 
 app.use(json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors({
+  origin: env.BASE_FRONTEND_URL
+}));
 
 // ADD ROUTE START
 const rootRoutePath = "./routes/api/";
