@@ -8,8 +8,10 @@ const baseRoute = "/api/products";
 
 export default function (app) {
     // GET
+    // app.get(baseRoute + "/",
+    //     paginateResult(category, { select: "_id title status createdAt" }));
     app.get(baseRoute + "/",
-        paginateResult(category, { select: "_id title status createdAt" }));
+        ProductController.index);
 
     // STORE
     app.post(baseRoute + "/",

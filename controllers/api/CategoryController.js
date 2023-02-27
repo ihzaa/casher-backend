@@ -1,5 +1,21 @@
 import category from '../../models/Category.js';
 
+async function index(req, res) {
+    try {
+        let data = await category.find({});
+        res.json({
+            status: true,
+            data
+        });
+    } catch (err) {
+        res.status(err.code ?? 500).json({
+            status: false,
+            message: err.message,
+        });
+    }
+
+}
+
 async function store(req, res) {
     try {
         const { title } = req.body;
@@ -20,4 +36,4 @@ async function store(req, res) {
 
 }
 
-export default { store }
+export default { store, index }

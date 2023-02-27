@@ -1,5 +1,21 @@
 import product from '../../models/Product.js';
 
+async function index(req, res) {
+    try {
+        let data = await product.find({});
+        res.json({
+            status: true,
+            data
+        });
+    } catch (err) {
+        res.status(err.code ?? 500).json({
+            status: false,
+            message: err.message,
+        });
+    }
+
+}
+
 async function store(req, res) {
     try {
         const { title, price, thumbnail, categoryId } = req.body;
@@ -25,4 +41,4 @@ async function store(req, res) {
 
 }
 
-export default { store }
+export default { store, index }
