@@ -4,7 +4,7 @@ import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
 
 const env = dotenv.config().parsed;
-const { sign } = jsonwebtoken;
+const { sign, verify } = jsonwebtoken;
 
 const getAccessToken = (payload) => {
   return sign(payload, env.JWT_ACCESS_TOKEN_SECRET, {
@@ -71,8 +71,8 @@ async function login(req, res) {
           { email: logedInUser.email, id: logedInUser.id }
         );
 
-        logedInUser.refresh_token = refreshToken;
-        await logedInUser.save();
+        // logedInUser.refresh_token = refreshToken;
+        // await logedInUser.save();
 
         return res.json({
           access_token: accessToken,
@@ -89,20 +89,20 @@ async function refresh_token(req, res) {
   if (!refresh_token)
     return res
       .status(400)
-      .json({ error: { message: "refresh token is required" } });
+      .json({ message: "refresh token is required", status: false });
 
-  const user = await user.findOne({
-    where: {
-      refresh_token,
-    },
-  });
+  // const user = await user.findOne({
+  //   where: {
+  //     refresh_token,
+  //   },
+  // });
 
-  if (!user)
-    return res
-      .status(400)
-      .json({ error: { message: "refresh token doesn't exist!" } });
+  // if (!user)
+  //   return res
+  //     .status(400)
+  //     .json({ error: { message: "refresh token doesn't exist!" } });
 
-  bcrypt.verify(refresh_token, env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
+  verify(refresh_token, env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
     if (err)
       return res.status(400).json({
         error: err,
