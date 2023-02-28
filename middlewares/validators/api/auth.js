@@ -4,8 +4,8 @@ import User from "../../../models/User.js";
 const auth = {
   register: [
     body("full_name").notEmpty().withMessage('is required.'),
-    body("status").notEmpty().withMessage('is required.').isIn(['active', 'inactive']),
-    body("role").notEmpty().withMessage('is required.').isIn(["admin", "casher", "employee"]),
+    // body("status").notEmpty().withMessage('is required.').isIn(['active', 'inactive']),
+    // body("role").notEmpty().withMessage('is required.').isIn(["admin", "casher", "employee"]),
     body("email")
       .notEmpty().withMessage('is required.')
       .isEmail()
