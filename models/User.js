@@ -21,6 +21,9 @@ const Schema = mongoose.Schema(
       enum: ["admin", "casher", "employee"],
       default: "employee",
     },
+    refresh_token: {
+      type: String,
+    },
     createdAt: {
       type: Number,
     },

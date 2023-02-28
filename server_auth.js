@@ -43,7 +43,10 @@ app.post(
  * @responseField access_token The token used for each request in header.
  * @responseField refresh_token The token that used for refresh access_token if expired.
  */
-app.post(baseRoute + "login", authValiation.login, authController.login);
+app.post(baseRoute + "login",
+  authValiation.login,
+  returnOnError,
+  authController.login);
 
 /**
  * Refresh Token

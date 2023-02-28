@@ -1,19 +1,27 @@
 import user from "../../models/User.js";
-import { validationResult } from "express-validator";
-import { hash, compare, genSalt } from "bcrypt";
+import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
+import dotenv from "dotenv";
+
+const env = dotenv.config().parsed;
+const { sign } = jsonwebtoken;
 
 const getAccessToken = (payload) => {
-  return sign(payload, process.env.JWT_ACCESS_TOKEN_SECRET, {
-    expiresIn: "30h",
+  return sign(payload, env.JWT_ACCESS_TOKEN_SECRET, {
+    expiresIn: env.JWT_ACCESS_TOKEN_LIFE,
+  });
+};
+const getRefreshToken = (payload) => {
+  return sign(payload, env.JWT_REFRESH_TOKEN_SECRET, {
+    expiresIn: env.JWT_REFRESH_TOKEN_LIFE,
   });
 };
 
 async function register(req, res) {
   try {
     const { full_name, email, status, role } = req.body;
-    const salt = await genSalt(10);
-    const password = await hash(req.body.password, salt);
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(req.body.password, salt);
 
     let data = {
       full_name,
@@ -25,65 +33,51 @@ async function register(req, res) {
 
     await user.create(data);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Registration Success",
     });
   } catch (err) {
-    res.status(err.code ?? 500).json({
+    return res.status(err.code ?? 500).json({
       status: false,
       message: err.message,
     });
   }
 }
 async function login(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array()[0] });
-  }
-
-  const { username, password } = req.body;
-  const user = await user.findOne({
-    where: {
-      username,
-    },
+  const { email, password } = req.body;
+  const logedInUser = await user.findOne({
+    email,
   });
 
-  if (!user) {
+  if (!logedInUser) {
     res.status(400).json({
-      error: {
-        value: username,
-        message: "Username Doesn't Exist!",
-      },
+      status: false,
+      message: "Wrong Username And Password Combination",
     });
   } else {
-    compare(password, user.password).then(async (match) => {
+    bcrypt.compare(password, logedInUser.password).then(async (match) => {
       if (!match)
         res.status(400).json({
-          error: {
-            error: {
-              value: username,
-              message: "Wrong Username And Password Combination",
-            },
-          },
+          status: false,
+          message: "Wrong Username And Password Combination",
         });
       else {
         const accessToken = getAccessToken({
-          username: user.username,
-          id: user.id,
+          email: logedInUser.email,
+          id: logedInUser.id,
         });
 
-        const refreshToken = sign(
-          { username: user.username, id: user.id },
-          process.env.JWT_REFRESH_TOKEN_SECRET
+        const refreshToken = getRefreshToken(
+          { email: logedInUser.email, id: logedInUser.id }
         );
 
-        user.refresh_token = refreshToken;
-        await user.save();
+        logedInUser.refresh_token = refreshToken;
+        await logedInUser.save();
 
-        res.json({
+        return res.json({
           access_token: accessToken,
           refresh_token: refreshToken,
-          username: username,
+          email: logedInUser.email,
           message: "Login Success!",
         });
       }
@@ -108,7 +102,7 @@ async function refresh_token(req, res) {
       .status(400)
       .json({ error: { message: "refresh token doesn't exist!" } });
 
-  verify(refresh_token, process.env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
+  bcrypt.verify(refresh_token, env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
     if (err)
       return res.status(400).json({
         error: err,
