@@ -1,7 +1,7 @@
-import { User } from "../../models";
+import user from "../../models/User.js";
 import { validationResult } from "express-validator";
-import { hash, compare } from "bcrypt";
-import { sign, verify } from "jsonwebtoken";
+import { hash, compare, genSalt } from "bcrypt";
+import jsonwebtoken from "jsonwebtoken";
 
 const getAccessToken = (payload) => {
   return sign(payload, process.env.JWT_ACCESS_TOKEN_SECRET, {
@@ -9,36 +9,40 @@ const getAccessToken = (payload) => {
   });
 };
 
-export async function register(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array()[0] });
+async function register(req, res) {
+  try {
+    const { full_name, email, status, role } = req.body;
+    const salt = await genSalt(10);
+    const password = await hash(req.body.password, salt);
+
+    let data = {
+      full_name,
+      email,
+      status,
+      role,
+      password,
+    };
+
+    await user.create(data);
+
+    res.status(200).json({
+      message: "Registration Success",
+    });
+  } catch (err) {
+    res.status(err.code ?? 500).json({
+      status: false,
+      message: err.message,
+    });
   }
-
-  const { name, username, email } = req.body;
-  const password = await hash(req.body.password, 10);
-
-  let data = {
-    name,
-    username,
-    email,
-    password,
-  };
-
-  await User.create(data);
-
-  res.status(200).json({
-    message: "Registration Success",
-  });
 }
-export async function login(req, res) {
+async function login(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array()[0] });
   }
 
   const { username, password } = req.body;
-  const user = await User.findOne({
+  const user = await user.findOne({
     where: {
       username,
     },
@@ -86,14 +90,14 @@ export async function login(req, res) {
     });
   }
 }
-export async function refresh_token(req, res) {
+async function refresh_token(req, res) {
   const { refresh_token } = req.body;
   if (!refresh_token)
     return res
       .status(400)
       .json({ error: { message: "refresh token is required" } });
 
-  const user = await User.findOne({
+  const user = await user.findOne({
     where: {
       refresh_token,
     },
@@ -116,14 +120,14 @@ export async function refresh_token(req, res) {
     res.json({ access_token: accessToken });
   });
 }
-export async function logout(req, res) {
+async function logout(req, res) {
   const { refresh_token } = req.body;
   if (!refresh_token)
     return res
       .status(400)
       .json({ error: { message: "refresh token is required" } });
 
-  const user = await User.findOne({
+  const user = await user.findOne({
     where: {
       refresh_token,
     },
@@ -141,3 +145,5 @@ export async function logout(req, res) {
     message: "logout successfully!",
   });
 }
+
+export default { register, login, refresh_token, logout }
