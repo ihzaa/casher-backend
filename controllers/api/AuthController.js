@@ -51,14 +51,14 @@ async function login(req, res) {
   });
 
   if (!logedInUser) {
-    res.status(400).json({
+    res.status(403).json({
       status: false,
       message: "Wrong Username And Password Combination",
     });
   } else {
     bcrypt.compare(password, logedInUser.password).then(async (match) => {
       if (!match)
-        res.status(400).json({
+        res.status(403).json({
           status: false,
           message: "Wrong Username And Password Combination",
         });
