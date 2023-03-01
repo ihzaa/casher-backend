@@ -20,9 +20,20 @@ const auth = {
   ],
 
   login: [
-    body("email").notEmpty().withMessage('is required.'),
+    body("email").notEmpty().withMessage('is required.').isEmail(),
     body("password").notEmpty().withMessage('is required.'),
   ],
+  isEmailExist: [
+    body("email")
+      .notEmpty().withMessage('is required.')
+      .isEmail()
+      .custom(async (email) => {
+        const getUser = await User.findOne({ email });
+        if (getUser) {
+          return Promise.reject("already in use.");
+        }
+      }),
+  ]
 };
 
 export default auth;

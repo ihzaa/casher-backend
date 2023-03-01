@@ -24,6 +24,12 @@ app.post(
   authController.register
 );
 
+app.post(
+  baseRoute + "is-email-exist",
+  authValiation.isEmailExist,
+  authController.isEmailExist
+);
+
 /**
  * Login
  *

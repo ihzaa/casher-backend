@@ -2,6 +2,7 @@ import user from "../../models/User.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
+import { validationResult } from "express-validator";
 
 const env = dotenv.config().parsed;
 const { sign, verify } = jsonwebtoken;
@@ -140,4 +141,25 @@ async function logout(req, res) {
   });
 }
 
-export default { register, login, refresh_token, logout }
+async function isEmailExist(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({
+      status: true,
+      message: 'Email already in use!',
+      data: {
+        is_email_exist: true
+      }
+    });
+  }
+  return res.status(400).json({
+    status: false,
+    message: 'Email is not in use!',
+    data: {
+      is_email_exist: false
+    }
+  });
+
+}
+
+export default { register, login, refresh_token, logout, isEmailExist }
