@@ -79,6 +79,7 @@ async function login(req, res) {
           access_token: accessToken,
           refresh_token: refreshToken,
           email: logedInUser.email,
+          fullname: logedInUser.full_name,
           message: "Login Success!",
         });
       }
