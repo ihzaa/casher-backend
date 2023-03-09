@@ -66,6 +66,7 @@ async function login(req, res) {
         const accessToken = getAccessToken({
           email: logedInUser.email,
           id: logedInUser.id,
+          role: logedInUser.role
         });
 
         const refreshToken = getRefreshToken(
@@ -110,8 +111,8 @@ async function refresh_token(req, res) {
         error: err,
       });
 
-    const { username, id } = data;
-    const accessToken = getAccessToken({ username, id });
+    const { username, id, role } = data;
+    const accessToken = getAccessToken({ username, id, role });
 
     res.json({ access_token: accessToken });
   });
