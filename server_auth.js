@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express, { json } from "express";
 import cors from "cors";
 import returnOnError from "./middlewares/validators/api/apiValidation.js";
-import mongoose from "mongoose";
+import { connection } from './connection.js'
 
 const env = dotenv.config().parsed;
 const app = express();
@@ -81,14 +81,7 @@ app.post(baseRoute + "refresh-token", authController.refresh_token);
  */
 app.delete(baseRoute + "logout", authController.logout);
 
-mongoose.set("strictQuery", false);
-mongoose.connect(`${env.MONGODB_URI}${env.MONGODB_HOST}:${env.MONGODB_PORT}`, {
-  dbName: env.MONGODB_DB_NAME,
-});
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error"));
-db.once("open", function () {
-  console.log("connected to mongodb");
+connection().then(() => {
   app.listen(env.SERVER_AUTH_PORT, () => {
     console.log("Auth server running in port: " + env.SERVER_AUTH_PORT);
   });
