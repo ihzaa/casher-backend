@@ -5,4 +5,5 @@ connection().then(async () => {
 
     const fakerFile = args[2];
     const faker = await import(`./${fakerFile}`);
+    faker.run();
 });
