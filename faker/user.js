@@ -1,10 +1,10 @@
 import user from "../models/User.js";
 import { faker } from "@faker-js/faker";
 
-const run = async () => {
+const run = async (limit = 10) => {
     try {
         var data = [];
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < limit; i++) {
             data.push({
                 full_name: faker.name.fullName(),
                 email: faker.internet.email(),
