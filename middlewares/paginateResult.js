@@ -9,9 +9,10 @@ const paginateResult = (model, options = {
 
       let offset = limit * page - limit;
 
+      let search = req.where;
       let data = await model
         .find({
-          ...options.where,
+          $or: search
         })
         .limit(limit)
         .skip(offset)

@@ -9,7 +9,23 @@ const baseRoute = "/api/users";
 export default function (app) {
     // GET
     app.get(baseRoute + "/",
-        paginateResult(user));
+        (req, res, next) => {
+            let search = req.query.search;
+            let where = [];
+            if (search) {
+                let select = 'full_name email role'.split(" ");
+                select.forEach(s => {
+                    let obj = {};
+                    obj[s] = { '$regex': search }
+                    where.push(obj);
+                });
+            }
+            req.where = where;
+            next();
+        },
+        paginateResult(user, {
+            select: '_id full_name email role',
+        }));
     // app.get(baseRoute + "/",
     //     ProductController.index);
 
