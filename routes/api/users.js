@@ -1,8 +1,8 @@
-import UserController from "../../controllers/api/ProductController.js";
+import UserController from "../../controllers/api/UserController.js";
 import returnOnError from "../../middlewares/validators/api/apiValidation.js";
-import ProductValidator from "../../middlewares/validators/api/product.js";
 import paginateResult from "../../middlewares/paginateResult.js";
 import user from '../../models/User.js';
+import userValidation from '../../middlewares/validators/api/users.js';
 
 const baseRoute = "/api/users";
 
@@ -26,14 +26,11 @@ export default function (app) {
         paginateResult(user, {
             select: '_id full_name email role',
         }));
-    // app.get(baseRoute + "/",
-    //     ProductController.index);
 
-    // STORE
-    // app.post(baseRoute + "/",
-    //     ProductValidator.store,
-    //     returnOnError,
-    //     UserController.store);
-
-
+    app.post(
+        baseRoute,
+        userValidation.store,
+        returnOnError,
+        UserController.store
+    );
 };
