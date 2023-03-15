@@ -60,6 +60,12 @@ export default {
         message: err.message,
       });
     }
+  },
+  async show(req, res) {
+    return res.status(200).json({
+      message: "OK",
+      data: res.obj
+    });
   }
 }
 

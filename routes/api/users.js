@@ -3,6 +3,7 @@ import returnOnError from "../../middlewares/validators/api/apiValidation.js";
 import paginateResult from "../../middlewares/paginateResult.js";
 import user from '../../models/User.js';
 import userValidation from '../../middlewares/validators/api/users.js';
+import findOrFail from '../../middlewares/findOrFail.js'
 
 const baseRoute = "/api/users";
 
@@ -39,5 +40,13 @@ export default function (app) {
         userValidation.update,
         returnOnError,
         UserController.update
+    );
+
+    app.get(
+        baseRoute + '/:id',
+        findOrFail(user,{
+            select: '_id full_name email role status',
+        }),
+        UserController.show
     );
 };
