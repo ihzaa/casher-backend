@@ -33,4 +33,11 @@ export default function (app) {
         returnOnError,
         UserController.store
     );
+
+    app.put(
+        baseRoute + '/:id',
+        userValidation.update,
+        returnOnError,
+        UserController.update
+    );
 };

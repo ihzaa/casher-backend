@@ -7,14 +7,13 @@ import { validationResult } from "express-validator";
 export default {
   async store(req, res) {
     try {
-      const { full_name, email, status, role } = req.body;
+      const { full_name, email, role } = req.body;
       const salt = await bcrypt.genSalt(10);
       const password = await bcrypt.hash(req.body.password, salt);
 
       let data = {
         full_name,
         email,
-        status,
         role,
         password,
       };
@@ -23,6 +22,36 @@ export default {
 
       return res.status(200).json({
         message: "STORE_SUCCESS",
+        data: obj
+      });
+    } catch (err) {
+      return res.status(err.code ?? 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  },
+  async update(req, res) {
+    try {
+      const { full_name, email, status, role } = req.body;
+      let data = {
+        full_name,
+        email,
+        status,
+        role,
+      };
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(req.body.password, salt);
+        data.password = password;
+      }
+
+      const id = req.query.id;
+      let obj = await user.updateOne({ id }, data);
+      // let obj = await user.findByIdAndUpdate(id, data, { new: true });
+
+      return res.status(200).json({
+        message: "UPDATE_SUCCESS",
         data: obj
       });
     } catch (err) {
