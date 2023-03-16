@@ -19,14 +19,14 @@ const auth = {
   ],
   update: [
     body("full_name").notEmpty().withMessage('is required.'),
-    body("status").notEmpty().withMessage('is required.').isIn(['active', 'inactive']),
+    // body("status").notEmpty().withMessage('is required.').isIn(['active', 'inactive']),
     body("role").notEmpty().withMessage('is required.').isIn(["admin", "casher", "employee"]),
     body("email")
       .notEmpty().withMessage('is required.')
       .isEmail()
       .custom(async (email, { req }) => {
         const getUser = await User.findOne({
-          $and: [
+        $and: [
             { email }, { _id: { $ne: req.params.id } }
           ]
         });

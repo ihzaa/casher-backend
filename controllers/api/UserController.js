@@ -37,7 +37,7 @@ export default {
       let data = {
         full_name,
         email,
-        status,
+        // status,
         role,
       };
       if (req.body.password) {
@@ -46,8 +46,8 @@ export default {
         data.password = password;
       }
 
-      const id = req.query.id;
-      let obj = await user.updateOne({ id }, data);
+      const id = req.params.id;
+      let obj = await user.updateOne({ _id: id }, data);
       // let obj = await user.findByIdAndUpdate(id, data, { new: true });
 
       return res.status(200).json({
