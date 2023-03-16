@@ -44,9 +44,17 @@ export default function (app) {
 
     app.get(
         baseRoute + '/:id',
-        findOrFail(user,{
+        findOrFail(user, {
             select: '_id full_name email role status',
         }),
         UserController.show
+    );
+
+    app.delete(
+        baseRoute + '/:id',
+        findOrFail(user, {
+            select: '_id',
+        }),
+        UserController.destroy
     );
 };

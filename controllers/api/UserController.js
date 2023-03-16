@@ -66,7 +66,23 @@ export default {
       message: "OK",
       data: res.obj
     });
-  }
+  },
+  async destroy(req, res) {
+    try {
+      const id = req.params.id;
+      let obj = await user.findByIdAndDelete(id);
+
+      return res.status(200).json({
+        message: "DELETE_SUCCESS",
+        data: obj
+      });
+    } catch (err) {
+      return res.status(err.code ?? 500).json({
+        status: false,
+        message: err.message,
+      });
+    }
+  },
 }
 
 // module.exports = {
