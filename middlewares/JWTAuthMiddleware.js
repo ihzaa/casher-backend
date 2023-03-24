@@ -1,30 +1,29 @@
-const { verify } = require("jsonwebtoken");
-const { User, Role } = require("../models/");
+import jsonwebtoken from "jsonwebtoken";
+import user from "../models/User.js";
+
+const { verify } = jsonwebtoken;
 
 const validateToken = async (req, res, next) => {
   const accessToken = req.header("x-access-token");
 
-  if (!accessToken)
-    return res.status(400).json({ errors: { message: "User Not Logged In!" } });
-
+  if (!accessToken) return res.status(400).json({ status: false, message: "UNAUTHORIZED" });
   try {
     const validToken = verify(accessToken, process.env.JWT_ACCESS_TOKEN_SECRET);
     if (validToken) {
-      req.user = await User.findByPk(validToken.id, {
-        attributes: ["id", "name", "username", "email"],
-        include: {
-          model: Role,
-          attributes: ["id", "name"],
-          through: {
-            attributes: [],
-          },
-        },
-      });
+      req.user = await user.findOne({ _id: validToken.id });
       return next();
+    } else {
+      throw {
+        message: 'UNAUTHORIZED'
+      }
     }
   } catch (err) {
-    return res.status(400).json({ errors: err.message });
+    let message = err.message;
+    if (message === 'invalid signature') message = 'INVALID_TOKEN';
+    else if (message === 'jwt expired') message = 'ACCESS_TOKEN_EXPIRED';
+    else message = 'INVALID_TOKEN';
+    return res.status(400).json({ status: false, message });
   }
 };
 
-module.exports = { validateToken };
+export default validateToken;
