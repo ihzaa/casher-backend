@@ -94,7 +94,7 @@ async function refresh_token(req, res) {
   const { refresh_token } = req.body;
   if (!refresh_token)
     return res
-      .status(400)
+      .status(401)
       .json({ message: "refresh token is required", status: false });
 
   // const user = await user.findOne({
@@ -110,7 +110,7 @@ async function refresh_token(req, res) {
 
   verify(refresh_token, env.JWT_REFRESH_TOKEN_SECRET, (err, data) => {
     if (err)
-      return res.status(400).json({
+      return res.status(401).json({
         error: err,
       });
     console.log(data);
