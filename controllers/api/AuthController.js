@@ -70,7 +70,10 @@ async function login(req, res) {
         });
 
         const refreshToken = getRefreshToken(
-          { email: logedInUser.email, id: logedInUser.id }
+          {
+            email: logedInUser.email, id: logedInUser.id,
+            role: logedInUser.role
+          }
         );
 
         // logedInUser.refresh_token = refreshToken;
@@ -110,9 +113,9 @@ async function refresh_token(req, res) {
       return res.status(400).json({
         error: err,
       });
-
-    const { username, id, role } = data;
-    const accessToken = getAccessToken({ username, id, role });
+    console.log(data);
+    const { email, id, role } = data;
+    const accessToken = getAccessToken({ email, id, role });
 
     res.json({ access_token: accessToken });
   });

@@ -22,7 +22,7 @@ const validateToken = async (req, res, next) => {
     if (message === 'invalid signature') message = 'INVALID_TOKEN';
     else if (message === 'jwt expired') message = 'ACCESS_TOKEN_EXPIRED';
     else message = 'INVALID_TOKEN';
-    return res.status(400).json({ status: false, message });
+    return res.status(401).json({ status: false, message });
   }
 };
 
