@@ -11,10 +11,14 @@ export default function (app) {
     // app.get(baseRoute + "/",
     //     paginateResult(category, { select: "_id title status createdAt" }));
     app.get(baseRoute + "/",
+        validateToken,
+        validateRole(['admin', 'casher', 'employee']),
         ProductController.index);
 
     // STORE
     app.post(baseRoute + "/",
+        validateToken,
+        validateRole(['admin', 'casher', 'employee']),
         ProductValidator.store,
         returnOnError,
         ProductController.store);

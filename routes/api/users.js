@@ -5,6 +5,7 @@ import user from '../../models/User.js';
 import userValidation from '../../middlewares/validators/api/users.js';
 import findOrFail from '../../middlewares/findOrFail.js'
 import validateToken from '../../middlewares/JWTAuthMiddleware.js';
+import validateRole from '../../middlewares/roleMiddleware.js';
 
 const baseRoute = "/api/users";
 
@@ -12,6 +13,7 @@ export default function (app) {
     // GET
     app.get(baseRoute + "/",
         validateToken,
+        validateRole(['admin']),
         (req, res, next) => {
             let search = req.query.search;
             let where = [];
@@ -32,6 +34,8 @@ export default function (app) {
 
     app.post(
         baseRoute,
+        validateToken,
+        validateRole(['admin']),
         userValidation.store,
         returnOnError,
         UserController.store
@@ -39,6 +43,8 @@ export default function (app) {
 
     app.put(
         baseRoute + '/:id',
+        validateToken,
+        validateRole(['admin']),
         userValidation.update,
         returnOnError,
         UserController.update
@@ -46,6 +52,8 @@ export default function (app) {
 
     app.get(
         baseRoute + '/:id',
+        validateToken,
+        validateRole(['admin']),
         findOrFail(user, {
             select: '_id full_name email role status',
         }),
@@ -54,6 +62,8 @@ export default function (app) {
 
     app.delete(
         baseRoute + '/:id',
+        validateToken,
+        validateRole(['admin']),
         findOrFail(user, {
             select: '_id',
         }),
