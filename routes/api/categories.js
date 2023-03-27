@@ -3,6 +3,8 @@ import returnOnError from "../../middlewares/validators/api/apiValidation.js";
 import CategoryValidator from "../../middlewares/validators/api/category.js";
 import paginateResult from "../../middlewares/paginateResult.js";
 import category from '../../models/Category.js';
+import validateToken from '../../middlewares/JWTAuthMiddleware.js';
+import validateRole from '../../middlewares/roleMiddleware.js';
 
 const baseRoute = "/api/categories";
 
